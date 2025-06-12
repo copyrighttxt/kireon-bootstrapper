@@ -1,4 +1,3 @@
-use chrono::format;
 use colored::*;
 use std::path::PathBuf;
 use reqwest::Client;
@@ -41,7 +40,7 @@ fn debug( message : &str ) {}
 pub async fn http_get( client: &Client ,url: &str ) -> Result<String, reqwest::Error> {
     debug(&format!("{} {}", "GET".green(), url.bright_blue()));
     let response = client.get(url).send().await;
-    if (response.is_err()) {
+    if response.is_err() {
         debug(&format!("Failed to fetch {}", url.bright_blue()));
         return Err(response.err().unwrap());
     }
@@ -122,7 +121,7 @@ pub async fn get_sha1_hash_of_file( path: &PathBuf ) -> String {
 }
 
 fn get_installation_directory() -> PathBuf {
-    return PathBuf::from(data_local_dir().unwrap().to_str().unwrap()).join("Syntax");
+    return PathBuf::from(data_local_dir().unwrap().to_str().unwrap()).join("Kireon");
 }
 
 #[tokio::main]
@@ -144,34 +143,39 @@ async fn main() {
     }
 
     let args: Vec<String> = std::env::args().collect();
-    let base_url : &str = "www.syntax.eco";
-    let mut setup_url : &str = "setup.syntax.eco";
-    let fallback_setup_url : &str = "d2f3pa9j0u8v6f.cloudfront.net";
-    let mut bootstrapper_filename :&str = "SyntaxPlayerLauncher.exe";
+    let base_url : &str = "www.kireon.xyz";
+    let mut setup_url : &str = "setup.kireon.xyz";
+    let fallback_setup_url : &str = "https://setup.kireon.xyz";
+    let bootstrapper_filename :&str = "KireonPlayerLauncher.exe";
     #[cfg(not(target_os = "windows"))]
     {
-        bootstrapper_filename = "SyntaxPlayerLinuxLauncher";
+        bootstrapper_filename = "KireonPlayerLinuxLauncher";
     }
     let build_date = include_str!(concat!(env!("OUT_DIR"), "/build_date.txt"));
-    let startup_text = format!("
-    .d8888b. Y88b   d88P  888b    888 88888888888     d8888 Y88b   d88P 
-    d88P  Y88b Y88b d88P  8888b   888     888        d88888  Y88b d88P  
-    Y88b.       Y88o88P   88888b  888     888       d88P888   Y88o88P   
-     \"Y888b.     Y888P    888Y88b 888     888      d88P 888    Y888P    
-        \"Y88b.    888     888 Y88b888     888     d88P  888    d888b    
-          \"888    888     888  Y88888     888    d88P   888   d88888b   
-    Y88b  d88P    888     888   Y8888     888   d8888888888  d88P Y88b  
-    \"Y8888P\"     888     888    Y888     888  d88P     888 d88P   Y88b
-     
-   {} | Build Date: {} | Version: {}", base_url ,build_date, env!("CARGO_PKG_VERSION"));
-
+    let startup_text = format!(
+        r#"
+        888    d8P  8888888 8888888b.  8888888888 .d88888b.  888b    888 
+        888   d8P     888   888   Y88b 888       d88P" "Y88b 8888b   888 
+        888  d8P      888   888    888 888       888     888 88888b  888 
+        888d88K       888   888   d88P 8888888   888     888 888Y88b 888 
+        8888888b      888   8888888P"  888       888     888 888 Y88b888 
+        888  Y88b     888   888 T88b   888       888     888 888  Y88888 
+        888   Y88b    888   888  T88b  888       Y88b. .d88P 888   Y8888 
+        888    Y88b 8888888 888   T88b 8888888888 "Y88888P"  888    Y888 
+    
+       {} | Build Date: {} | Version: {}"#, 
+        base_url, 
+        build_date, 
+        env!("CARGO_PKG_VERSION")
+    );
+    
     // Format the startup text to be centered
     let mut terminal_width = 80;
     if let Some((w, _h)) = term_size::dimensions() {
         terminal_width = w;
     }
     if terminal_width < 80 {
-        print!("{}\n", format!("SYNTAX Bootstrapper | {} | Build Date: {} | Version: {}", base_url, build_date, env!("CARGO_PKG_VERSION")).to_string().magenta().cyan().italic().on_black()); // Fallback message
+        print!("{}\n", format!("KIREON Bootstrapper | {} | Build Date: {} | Version: {}", base_url, build_date, env!("CARGO_PKG_VERSION")).to_string().magenta().cyan().italic().on_black()); // Fallback message
     } else {
         let startup_text_lines = startup_text.lines().collect::<Vec<&str>>();
         //println!("{}", startup_text.bold().blue().on_black());
@@ -290,18 +294,18 @@ async fn main() {
                 std::process::Command::new("chmod").arg("+x").arg(latest_bootstrapper_path.to_str().unwrap()).spawn().unwrap();
 
                 let desktop_file_content = &format!("[Desktop Entry]
-Name=Syntax Launcher
+Name=Kireon Launcher
 Exec={} %u
 Icon={}
 Type=Application
 Terminal=true
 Version={}
-MimeType=x-scheme-handler/syntax-player;", latest_bootstrapper_path.to_str().unwrap(), latest_bootstrapper_path.to_str().unwrap(), env!("CARGO_PKG_VERSION"));
+MimeType=x-scheme-handler/kireon-player;", latest_bootstrapper_path.to_str().unwrap(), latest_bootstrapper_path.to_str().unwrap(), env!("CARGO_PKG_VERSION"));
                 
-                let desktop_file_path = dirs::data_local_dir().unwrap().join("applications").join("syntax-player.desktop");
+                let desktop_file_path = dirs::data_local_dir().unwrap().join("applications").join("kireon-player.desktop");
                 std::fs::write(desktop_file_path, desktop_file_content).unwrap();
 
-                info("Please launch SYNTAX from the website, to continue with the update process.");
+                info("Please launch KIREON from the website, to continue with the update process.");
                 std::thread::sleep(std::time::Duration::from_secs(20));
             }
             std::process::exit(0);
@@ -329,12 +333,7 @@ MimeType=x-scheme-handler/syntax-player;", latest_bootstrapper_path.to_str().unw
         }
 
         let VersionURLPrefix = format!("https://{}/{}-", setup_url, latest_client_version);
-
-        let Client2018Zip : PathBuf = download_file_prefix(&http_client, format!("{}2018client.zip", VersionURLPrefix).as_str(), &temp_downloads_directory).await;
-        let Client2020Zip : PathBuf = download_file_prefix(&http_client, format!("{}2020client.zip", VersionURLPrefix).as_str(), &temp_downloads_directory).await;
-        let Client2014Zip : PathBuf = download_file_prefix(&http_client, format!("{}2014client.zip", VersionURLPrefix).as_str(), &temp_downloads_directory).await;
-        let Client2016Zip : PathBuf = download_file_prefix(&http_client, format!("{}2016client.zip", VersionURLPrefix).as_str(), &temp_downloads_directory).await;
-        let Client2021Zip : PathBuf = download_file_prefix(&http_client, format!("{}2021client.zip", VersionURLPrefix).as_str(), &temp_downloads_directory).await;
+		let Client2021Zip : PathBuf = download_file_prefix(&http_client, format!("{}2021client.zip", VersionURLPrefix).as_str(), &temp_downloads_directory).await;
         info("Download finished, extracting files.");
 
         fn extract_to_dir( zip_file : &PathBuf, target_dir : &PathBuf ) {
@@ -343,58 +342,42 @@ MimeType=x-scheme-handler/syntax-player;", latest_bootstrapper_path.to_str().unw
             zip_extract::extract(zip_file_cursor, target_dir, false).unwrap();
         }
 
-        let client_2018_directory = current_version_directory.join("Client2018");
-        create_folder_if_not_exists(&client_2018_directory).await;
-        extract_to_dir(&Client2018Zip, &client_2018_directory);
-
-        let client_2020_directory = current_version_directory.join("Client2020");
-        create_folder_if_not_exists(&client_2020_directory).await;
-        extract_to_dir(&Client2020Zip, &client_2020_directory);
-
-        let client_2014_directory = current_version_directory.join("Client2014");
-        create_folder_if_not_exists(&client_2014_directory).await;
-        extract_to_dir(&Client2014Zip, &client_2014_directory);
-
-        let client_2016_directory = current_version_directory.join("Client2016");
-        create_folder_if_not_exists(&client_2016_directory).await;
-        extract_to_dir(&Client2016Zip, &client_2016_directory);
-
-        let client_2021_directory = current_version_directory.join("Client2021");
+		let client_2021_directory = current_version_directory.join("Client2021");
         create_folder_if_not_exists(&client_2021_directory).await;
         extract_to_dir(&Client2021Zip, &client_2021_directory);
 
         info("Finished extracting files, cleaning up.");
         std::fs::remove_dir_all(&temp_downloads_directory).unwrap();
 
-        // Install the syntax-player scheme in the registry
-        info("Installing syntax-player scheme");
+        // Install the kireon-player scheme in the registry
+        info("Installing kireon-player scheme");
         #[cfg(target_os = "windows")]
         {
             let hkey_current_user = RegKey::predef(HKEY_CURRENT_USER);
             let hkey_classes_root : RegKey = hkey_current_user.open_subkey("Software\\Classes").unwrap();
-            let hkey_syntax_player = hkey_classes_root.create_subkey("syntax-player").unwrap().0;
+            let hkey_syntax_player = hkey_classes_root.create_subkey("kireon-player").unwrap().0;
             let hkey_syntax_player_shell = hkey_syntax_player.create_subkey("shell").unwrap().0;
             let hkey_syntax_player_shell_open = hkey_syntax_player_shell.create_subkey("open").unwrap().0;
             let hkey_syntax_player_shell_open_command = hkey_syntax_player_shell_open.create_subkey("command").unwrap().0;
             let defaulticon = hkey_syntax_player.create_subkey("DefaultIcon").unwrap().0;
             hkey_syntax_player_shell_open_command.set_value("", &format!("\"{}\" \"%1\"", latest_bootstrapper_path.to_str().unwrap())).unwrap();
             defaulticon.set_value("", &format!("\"{}\",0", latest_bootstrapper_path.to_str().unwrap())).unwrap();
-            hkey_syntax_player.set_value("", &format!("URL: Syntax Protocol")).unwrap();
+            hkey_syntax_player.set_value("", &format!("URL: Kireon Protocol")).unwrap();
             hkey_syntax_player.set_value("URL Protocol", &"").unwrap();
         }
         #[cfg(not(target_os = "windows"))]
         {
             // Linux support
             let desktop_file_content = &format!("[Desktop Entry]
-Name=Syntax Launcher
+Name=Kireon Launcher
 Exec={} %u
 Icon={}
 Type=Application
 Terminal=true
 Version={}
-MimeType=x-scheme-handler/syntax-player;", latest_bootstrapper_path.to_str().unwrap(), latest_bootstrapper_path.to_str().unwrap(), env!("CARGO_PKG_VERSION"));
+MimeType=x-scheme-handler/kireon-player;", latest_bootstrapper_path.to_str().unwrap(), latest_bootstrapper_path.to_str().unwrap(), env!("CARGO_PKG_VERSION"));
             
-            let desktop_file_path = dirs::data_local_dir().unwrap().join("applications").join("syntax-player.desktop");
+            let desktop_file_path = dirs::data_local_dir().unwrap().join("applications").join("kireon-player.desktop");
             std::fs::write(desktop_file_path, desktop_file_content).unwrap();
         }
 
@@ -421,24 +404,24 @@ MimeType=x-scheme-handler/syntax-player;", latest_bootstrapper_path.to_str().unw
     }
 
     // Parse the arguments passed to the bootstrapper
-    // Looks something like "syntax-player://1+launchmode:play+gameinfo:TICKET+placelauncherurl:https://www.syntax.eco/Game/placelauncher.ashx?placeId=660&t=TICKET+k:l"
+    // Looks something like "kireon-player://1+launchmode:play+gameinfo:TICKET+placelauncherurl:https://www.kireon.org/Game/placelauncher.ashx?placeId=660&t=TICKET+k:l"
     debug(&format!("Arguments Passed: {}", args.join(" ").bright_blue()));
     if args.len() == 1 {
         // Just open the website
         #[cfg(target_os = "windows")]
         {
-            std::process::Command::new("cmd").arg("/c").arg("start").arg("https://www.syntax.eco/games").spawn().unwrap();
+            std::process::Command::new("cmd").arg("/c").arg("start").arg("https://www.kireon.xyz/games").spawn().unwrap();
             std::process::exit(0);
         }
         #[cfg(not(target_os = "windows"))]
         {
-            std::process::Command::new("xdg-open").arg("https://www.syntax.eco/games").spawn().unwrap();
+            std::process::Command::new("xdg-open").arg("https://www.kireon.org/games").spawn().unwrap();
             std::process::exit(0);
         }
     }
 
     let main_args = &args[1];
-    let main_args = main_args.replace("syntax-player://", "");
+    let main_args = main_args.replace("kireon-player://", "");
     let main_args = main_args.split("+").collect::<Vec<&str>>();
 
     let mut launch_mode = String::new();
@@ -486,31 +469,21 @@ MimeType=x-scheme-handler/syntax-player;", latest_bootstrapper_path.to_str().unw
             info(format!("If you want to use a custom wine binary, please create a file at {} with the path to the wine binary", wine_path_file.to_str().unwrap()).as_str());
         }
     }
-    let client_executable_path : PathBuf;
-    debug(&client_year.to_string());
-    if client_year == "2018" {
-        client_executable_path = current_version_directory.join("Client2018").join("SyntaxPlayerBeta.exe");
-    } else if client_year == "2020" {
-        client_executable_path = current_version_directory.join("Client2020").join("SyntaxPlayerBeta.exe");
-    } else if client_year == "2014" {
-        client_executable_path = current_version_directory.join("Client2014").join("SyntaxPlayerBeta.exe");
-    } else if client_year == "2021" {
-        client_executable_path = current_version_directory.join("Client2021").join("SyntaxPlayerBeta.exe");
-    } else {
-        client_executable_path = current_version_directory.join("Client2016").join("SyntaxPlayerBeta.exe");
-    }
+let client_executable_path : PathBuf;
+debug(&client_year.to_string());
+client_executable_path = current_version_directory.join("Client2021").join("KireonPlayerBeta.exe");
     if !client_executable_path.exists() {
         // Delete AppSettings.xml so the bootstrapper will download the client again
         let app_settings_path = current_version_directory.join("AppSettings.xml");
         std::fs::remove_file(app_settings_path).unwrap();
 
-        error("Failed to run SyntaxPlayerBeta.exe, is your antivirus removing it? The bootstrapper will attempt to redownload the client on next launch.");
+        error("Failed to run KireonPlayerBeta.exe, is your antivirus removing it? The bootstrapper will attempt to redownload the client on next launch.");
         std::thread::sleep(std::time::Duration::from_secs(20));
         std::process::exit(0);
     }
     match launch_mode.as_str() {
         "play" => {
-            info("Launching SYNTAX");
+            info("Launching KIREON Player");
             #[cfg(target_os = "windows")]
             {           
                 let mut command = std::process::Command::new(client_executable_path);

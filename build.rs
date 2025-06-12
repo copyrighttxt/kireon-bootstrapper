@@ -16,13 +16,13 @@ fn main() {
         res.set_icon("assets/Bootstrapper.ico");
         res.set_language(0x0409); // US English
         res.set("FileVersion", env!("CARGO_PKG_VERSION"));
-        res.set("FileDescription", "SYNTAX Windows Bootstrapper");
-        res.set("ProductName", "SYNTAX Bootstrapper");
+        res.set("FileDescription", "Kireon Windows Bootstrapper");
+        res.set("ProductName", "Kireon Bootstrapper");
         res.set("ProductVersion", env!("CARGO_PKG_VERSION"));
-        res.set("InternalName", "SYNTAX Bootstrapper");
-        res.set("OriginalFilename", "SyntaxPlayerLauncher.exe");
-        res.set("CompanyName", "SYNTAX Corporation");
-        res.set("LegalCopyright", "Copyright (c) 2023");
+        res.set("InternalName", "Kireon Bootstrapper");
+        res.set("OriginalFilename", "KireonPlayerLauncher.exe");
+        res.set("CompanyName", "Brick Technologies, LLC");
+        res.set("LegalCopyright", "Copyright (c) 2021");
         res.compile().unwrap();
     }
 
