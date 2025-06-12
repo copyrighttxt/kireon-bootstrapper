@@ -1,4 +1,4 @@
-# SUBTER Boostrapper
+# KIREON Boostrapper
 A bootstrapper based on the SYNTAX bootstrapper written in Rust meant to replace the old Roblox Launcher
 
 You are welcome to add support to other platforms ( *MacOS* ) or add improvements to the bootstrapper
