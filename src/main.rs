@@ -149,7 +149,7 @@ async fn main() {
     let bootstrapper_filename :&str = "KireonPlayerLauncher.exe";
     #[cfg(not(target_os = "windows"))]
     {
-        bootstrapper_filename = "KireonPlayerLinuxLauncher";
+       let mut bootstrapper_filename = "KireonPlayerLinuxLauncher";
     }
     let build_date = include_str!(concat!(env!("OUT_DIR"), "/build_date.txt"));
     let startup_text = format!(
