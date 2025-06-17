@@ -146,10 +146,10 @@ async fn main() {
     let base_url : &str = "www.kireon.xyz";
     let mut setup_url : &str = "setup.kireon.xyz";
     let fallback_setup_url : &str = "https://setup.kireon.xyz";
-    let bootstrapper_filename :&str = "KireonPlayerLauncher.exe";
+    let mut bootstrapper_filename :&str = "KireonPlayerLauncher.exe";
     #[cfg(not(target_os = "windows"))]
     {
-       let mut bootstrapper_filename = "KireonPlayerLinuxLauncher";
+        bootstrapper_filename = "KireonPlayerLinuxLauncher";
     }
     let build_date = include_str!(concat!(env!("OUT_DIR"), "/build_date.txt"));
     let startup_text = format!(
@@ -404,7 +404,7 @@ MimeType=x-scheme-handler/kireon-player;", latest_bootstrapper_path.to_str().unw
     }
 
     // Parse the arguments passed to the bootstrapper
-    // Looks something like "kireon-player://1+launchmode:play+gameinfo:TICKET+placelauncherurl:https://www.kireon.org/Game/placelauncher.ashx?placeId=660&t=TICKET+k:l"
+    // Looks something like "kireon-player://1+launchmode:play+gameinfo:TICKET+placelauncherurl:https://www.kireon.xyz/Game/placelauncher.ashx?placeId=660&t=TICKET+k:l"
     debug(&format!("Arguments Passed: {}", args.join(" ").bright_blue()));
     if args.len() == 1 {
         // Just open the website
@@ -415,7 +415,7 @@ MimeType=x-scheme-handler/kireon-player;", latest_bootstrapper_path.to_str().unw
         }
         #[cfg(not(target_os = "windows"))]
         {
-            std::process::Command::new("xdg-open").arg("https://www.kireon.org/games").spawn().unwrap();
+            std::process::Command::new("xdg-open").arg("https://www.kireon.xyz/games").spawn().unwrap();
             std::process::exit(0);
         }
     }
