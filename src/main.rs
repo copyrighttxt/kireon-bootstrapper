@@ -304,6 +304,15 @@ MimeType=x-scheme-handler/kireon-player;", latest_bootstrapper_path.to_str().unw
                 
                 let desktop_file_path = dirs::data_local_dir().unwrap().join("applications").join("kireon-player.desktop");
                 std::fs::write(desktop_file_path, desktop_file_content).unwrap();
+                // Register the MIME type handler and update desktop database
+                let _ = std::process::Command::new("xdg-mime")
+                    .args(&["default", "kireon-player.desktop", "x-scheme-handler/kireon-player"])
+                    .status();
+
+                let _ = std::process::Command::new("update-desktop-database")
+                    .arg(format!("{}/.local/share/applications", std::env::var("HOME").unwrap()))
+                    .status();
+
 
                 info("Please launch KIREON from the website, to continue with the update process.");
                 std::thread::sleep(std::time::Duration::from_secs(20));
@@ -379,6 +388,15 @@ MimeType=x-scheme-handler/kireon-player;", latest_bootstrapper_path.to_str().unw
             
             let desktop_file_path = dirs::data_local_dir().unwrap().join("applications").join("kireon-player.desktop");
             std::fs::write(desktop_file_path, desktop_file_content).unwrap();
+                // Register the MIME type handler and update desktop database
+                let _ = std::process::Command::new("xdg-mime")
+                    .args(&["default", "kireon-player.desktop", "x-scheme-handler/kireon-player"])
+                    .status();
+
+                let _ = std::process::Command::new("update-desktop-database")
+                    .arg(format!("{}/.local/share/applications", std::env::var("HOME").unwrap()))
+                    .status();
+
         }
 
         // Write the AppSettings.xml file
